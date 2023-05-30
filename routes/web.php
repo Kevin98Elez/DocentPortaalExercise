@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\PageController;
 
+use Yajra\DataTables\Html\Builder;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,7 +20,8 @@ use App\Http\Controllers\PageController;
 
 Route::get('/', function () {
     $pages = App\Models\Page::All();
-    return view('welcome', compact('pages'));
+    $teachers = App\Models\Teacher::paginate(10);
+    return view('welcome', compact('pages', 'teachers'));
 })->name('welcome');
 
 Route::group(['prefix' => 'admin'], function () {
@@ -31,5 +34,9 @@ Route::controller(RegisterController::class)->group(function () {
 });
 
 Route::get('/{pageName}', [PageController::class, 'index'])->name('page');
+
+Route::get('users', function(Builder $builder) {
+    return DataTables::of(Teacher::query())->toJson();
+});
 
 
