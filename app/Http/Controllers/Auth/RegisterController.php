@@ -8,10 +8,13 @@ use App\Models\Location;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Mail;
+
 
 
 class RegisterController extends Controller
 {
+
 
 
     /**
@@ -38,18 +41,25 @@ class RegisterController extends Controller
      */
     public function store(Request $request)
     {
+        // Regular expressions
+        $nameRegex = '/^[A-Za-z\s]+$/';
+        $streetNrRegex = '/^[A-Za-z0-9\s]+$/';
+        
+
         $request->validate([
-            'name' => 'required|string|max:250',
-            'firstname' => 'required|string|max:250',
+            'name' => "required|string|regex:$nameRegex|max:250",
+            'firstname' => "required|string|regex:$nameRegex|max:250",
             'email' => 'required|email|max:250|unique:users',
-            'description' => 'required|string|max:250',
+            'description' => "required|string|regex:$nameRegex|max:250",
             'remarks' => 'nullable|string|max:250',
-            'phone' => 'required|string|max:9999999999',
+            'phone' => "required",
             'website' => 'nullable|string',
             'location' => 'required|integer',
             'category' => 'required|integer',
+            'streetnr' => "required|string|regex:$streetNrRegex",
+            'codecity' => "required|string",
         ]);
-
+       
 
         Teacher::create([
             'lastname' => $request->name,
@@ -62,6 +72,15 @@ class RegisterController extends Controller
             'approved' => 0, // Set 'approved' field to 0 by default
             'location_id' => $request->location,
             'category_id' => $request->category,
+            'streetnr' => $request->streetnr,
+            'codecity' => $request->codecity,
         ]);
+
+
+        
+        Mail::send('mail.mail', $request->all(), function($message){
+            $message->to(request('email'))
+            ->subject('Bedankt voor uw registratie, '. request('firstname').'.');
+        });
     }
 }
