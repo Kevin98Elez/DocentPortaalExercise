@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\PageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,8 +17,9 @@ use App\Http\Controllers\Auth\RegisterController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
-});
+    $pages = App\Models\Page::All();
+    return view('welcome', compact('pages'));
+})->name('welcome');
 
 Route::group(['prefix' => 'admin'], function () {
     Voyager::routes();
@@ -27,4 +29,7 @@ Route::controller(RegisterController::class)->group(function () {
     Route::get('/register', 'register')->name('register');
     Route::post('/store', 'store')->name('store');
 });
+
+Route::get('/{pageName}', [PageController::class, 'index'])->name('page');
+
 
