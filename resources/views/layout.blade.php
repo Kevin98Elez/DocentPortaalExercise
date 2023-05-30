@@ -12,6 +12,10 @@
         @include('navigation')
     </div>
 
+    <div class="container">
+        @yield('map')
+    </div>
+
 
 
     <div class="container">
